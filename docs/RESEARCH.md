@@ -129,13 +129,39 @@ wss://{email}:{owner_token}@streaming.vn.teslamotors.com/connect/{vehicle_id}
 | 공식 Apple Watch 앱 | ✅ SW 2024.44.25+ 충족 |
 | 결론 | 차량은 모든 기능을 갖췄으나, 전진/후진은 **공식 앱에만 열린 Hermes 채널**로만 제어됨 → Track B No-Go 판단 유지 |
 
+### 2.9 EAP/FSD 구매 없이 전진/후진을 쓸 수 있는가 → ❌ 불가 (차량 펌웨어 레벨 잠금)
+
+사용자 목표: **EAP를 사지 않고** 전진/후진을 조작. 이 경우 장벽이 두 겹으로 겹칩니다.
+
+**장벽 1 — 라이선스 잠금 (VIN 단위, 서버+차량 펌웨어)**
+- 전진/후진(Dumb Summon)과 Actually Smart Summon은 모두 **EAP 또는 FSD 패키지에만 포함**된 기능입니다. 기본 오토파일럿(모든 차량 무료)에는 없습니다.
+- 이 잠금은 앱이 아니라 **차량 소프트웨어 자체**에 걸려 있습니다. 구매 이력이 VIN에 연동되어 서버·차량 펌웨어의 기능 플래그로 관리됩니다.
+- 즉 **명령을 어떤 경로로 보내든(공식 앱, Fleet API, BLE, 비공식 웹소켓) 차량이 실행을 거부**합니다. 라이선스가 없으면 Summon 세션 자체가 열리지 않습니다.
+- 결론: EAP 없이는 **테슬라 공식 앱으로도 전진/후진 버튼이 나타나지 않습니다.** API 우회로 풀 수 있는 문제가 아닙니다.
+
+**장벽 2 — 인터페이스 잠금 (2.7절)**
+- 설령 EAP가 있어도 전진/후진은 공식 앱의 Hermes 서명 채널로만 제어됩니다. 서드파티 경로 없음.
+
+**정리**: 장벽 1이 근본적입니다. 라이선스가 없으면 기능이 차량에 존재하지 않으므로, 워치 앱·API·프록시를 아무리 잘 만들어도 차는 움직이지 않습니다.
+
+**언급만 하는 비현실적 경로 (권장하지 않음)**
+| 경로 | 설명 | 평가 |
+|---|---|---|
+| CAN 인젝션 / 펌웨어 모드 | OBD-II·CAN 버스에 하드웨어(Flipper Zero, ESP32 등)를 붙여 FSD/EAP 플래그를 강제로 켜려는 모딩 커뮤니티 존재 | **불가에 가까움.** 최신 펌웨어(2026.14.x+)는 activation preflight·리전 잠금으로 차단. VIN 검증에 걸림 |
+| — | 워치/스마트폰 API와 무관한 물리적 차량 해킹 | 보증 무효, 약관 위반, 안전·법적 책임, 상시 동작 불가 |
+
+이 방식은 워치 앱 프로젝트의 범위를 벗어나고, 실현성·합법성·안전성 모두에서 부적합하므로 **채택하지 않습니다.**
+
+**참고 — 검색 중 상충 정보**
+일부 블로그(Torque News, TeslaTap 요약)는 "Summon은 FSD 없이 쓰는 기본 기능"이라고 서술하나, 이는 부정확하거나 오래된 정보입니다. 테슬라 공식 지원 문서와 다수 오너 포럼(TMC)은 **Summon = EAP/FSD 전용**으로 일관되게 확인합니다. 2021년 5월 이후 레이더·USS 제거 차량은 auto-summon도 별도로 제한됐습니다.
+
 ---
 
 ## 3. Go / No-Go 판단
 
 | 트랙 | 판단 | 근거 |
 |---|---|---|
-| **Track B: 전진/후진(Summon)** | **No-Go** | 공식 경로 없음. 비공식 경로는 차단 진행 중이며 시도 자체가 계정 제재 사유. 안전 책임 문제까지 고려 시 개인 프로젝트로 감당 불가 |
+| **Track B: 전진/후진(Summon)** | **No-Go (이중 차단)** | ① EAP/FSD 미구매 시 기능이 차량에 존재하지 않음(VIN 라이선스 잠금) → 어떤 API로도 실행 불가. ② EAP가 있어도 서드파티 제어 경로 없음(Hermes 전용). 비공식 경로는 계정 제재·약관 위반 |
 | **Track A: 공식 API 기본 제어** | **조건부 Go** | 구현 가능하고 비용도 낮음. 단, 테슬라 공식 워치 앱과 기능 중복 → "공식 앱이 못 하는 것"을 찾아야 의미 있음 |
 
 ---
@@ -198,3 +224,7 @@ wss://{email}:{owner_token}@streaming.vn.teslamotors.com/connect/{vehicle_id}
 - TesKey(watchOS BLE 오픈소스): https://github.com/acvigue/TesKey
 - Fleet API 등록 가이드(Home Assistant): https://www.home-assistant.io/integrations/tesla_fleet/
 - 서드파티 앱 접근 관리(Tesla): https://www.tesla.com/support/access-third-party-apps
+- 오토파일럿/EAP/FSD 기능 차이(Not a Tesla App): https://www.notateslaapp.com/news/2092/teslas-autopilot-difference-between-basic-autopilot-enhanced-autopilot-and-fsd
+- Summon EAP 필요 여부 논의(TMC): https://teslamotorsclub.com/tmc/threads/can-i-access-the-summon-command-without-full-self-driving-capability.263192/
+- FSD 없이 전진/후진 요청(TeslaTap): https://teslatap.com/desired-features/ability-to-move-forward-back-with-app-without-fsd/
+- Tesla 오토파일럿 지원 문서: https://www.tesla.com/support/autopilot
