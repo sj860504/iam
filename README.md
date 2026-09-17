@@ -70,7 +70,7 @@ iam/
 ## 개발 로드맵
 
 - [x] Phase 0: 테슬라 API 조사 및 Go/No-Go 판단 → [RESEARCH.md](docs/RESEARCH.md)
-- [ ] Phase 1: Xcode 프로젝트 골격, CI
+- [x] Phase 1: 프로젝트 골격(XcodeGen) — 빌드 가이드 [BUILD.md](docs/BUILD.md)
 - [ ] Phase 2: 로그인, 차량 상태 조회, 잠금/해제·경적·트렁크 제어
 - [ ] Phase 3: Hold-to-Move, 데드맨 타이머 등 안전 인프라
 - [ ] ~~Phase 4: 전진/후진(Summon) 실험 구현 및 실차 테스트~~ (보류)

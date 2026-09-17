@@ -19,7 +19,7 @@
 
 ### 1.1 YouTube를 꼭 쓰려면 (합법 경로만)
 
-- **YouTube Premium**: 공식 오프라인 재생. 단 YouTube 앱 안에서만 재생되고 이 앱으로 파일을 가져올 수 없음. Apple Watch용 YouTube Music 오프라인은 아직 미지원(폰 저장분만 표시).
+- **YouTube Premium**: 공식 오프라인 재생. 단 다운로드가 **YouTube 앱 안에 DRM으로 잠겨** 있어 이 앱으로 파일을 가져올 수 없음(확인됨). 즉 Premium은 이 플레이어의 곡 공급원이 될 수 없음. Apple Watch용 YouTube Music 오프라인도 아직 미지원(폰 저장분만 표시).
 - **YouTube에 내가 올린 내 콘텐츠**: YouTube Studio에서 원본을 내려받아 이 앱에 넣는 것은 가능(내 저작물).
 - **Creative Commons(재사용 허용) 표시 영상**: 라이선스 범위 내에서 사용 가능. 다만 다운로드 자체는 여전히 공식 수단이 없어, CC 원본을 제공하는 별도 출처를 써야 함.
 
@@ -65,20 +65,21 @@
 
 ## 3. 단계별 계획
 
-### Phase 1 — 골격 (1주)
-- [ ] Xcode 프로젝트: `iam`(iOS) + `iam Watch App`(watchOS)
-- [ ] WatchConnectivity 세션 수립, 연결 상태 표시
-- [ ] 폴더 구조, 재생/전송 상태 모델
+### Phase 1 — 골격 (1주) — ✅ 진행 중
+- [x] 프로젝트 명세(XcodeGen `project.yml`): `iam`(iOS) + `iam Watch App`(watchOS)
+- [x] WatchConnectivity 세션 수립(양쪽), 연결 상태 표시
+- [x] 폴더 구조, 공유 `MediaItem` 모델, 재생/전송 상태 모델
 
 ### Phase 2 — iPhone import & 라이브러리 (1~2주)
-- [ ] 파일 import(Document Picker, 공유 시트로 다른 앱에서 받기)
-- [ ] 오디오 메타데이터·앨범아트 추출, 라이브러리 목록
-- [ ] 지원 포맷 검증(m4a, mp3, aac, wav 등)
+- [x] 파일 import(`fileImporter`/Document Picker)
+- [x] 오디오 메타데이터(제목·아티스트·길이) 추출, 라이브러리 목록·JSON 인덱스
+- [ ] 공유 시트로 다른 앱에서 받기(Share Extension), 앨범아트, 포맷 검증 강화
 
-### Phase 3 — 워치 전송 & 오프라인 재생 (2주)
-- [ ] `transferFile`로 워치에 전송, 진행률·재시도·중복 방지
-- [ ] 워치 로컬 저장, 오프라인 오디오 재생(백그라운드, 블루투스 이어폰)
-- [ ] Now Playing UI, Digital Crown 볼륨, 이전/다음
+### Phase 3 — 워치 전송 & 오프라인 재생 (2주) — 골격 완료
+- [x] `transferFile`로 워치에 전송, 수신·로컬 저장·중복 방지
+- [x] 오프라인 오디오 재생(`AVAudioPlayer`, 백그라운드 오디오 세션)
+- [x] 기본 Now Playing UI(재생/일시정지/정지)
+- [ ] 진행률·재시도 표시, Digital Crown 볼륨, 이전/다음, 재생 위치 복원
 
 ### Phase 4 — 관리 기능 (1주)
 - [ ] 저장공간 표시·곡 삭제, 재생목록, 정렬/검색

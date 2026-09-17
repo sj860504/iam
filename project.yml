@@ -1,0 +1,56 @@
+name: iam
+options:
+  bundleIdPrefix: com.iam
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  createIntermediateGroups: true
+
+targets:
+  iam:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - Shared
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: iam
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.iam.app
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: false
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - target: iam Watch App
+        embed: true
+
+  iam Watch App:
+    type: application
+    platform: watchOS
+    sources:
+      - WatchApp
+      - Shared
+    info:
+      path: WatchApp/Info.plist
+      properties:
+        CFBundleDisplayName: iam
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.iam.app
+        UIBackgroundModes:
+          - audio
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.iam.app.watchkitapp
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: false
+        TARGETED_DEVICE_FAMILY: "4"
