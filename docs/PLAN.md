@@ -100,12 +100,12 @@
 
 ## 5. 단계별 개발 계획
 
-### Phase 0 — 조사 및 검증 (1~2주)
-- [ ] Tesla 개발자 계정 등록, Fleet API 앱 생성, 도메인·공개키 호스팅
-- [ ] 보유 차량 모델·소프트웨어 버전에서 Summon(전진/후진) 지원 여부 확인(USS 장착 여부)
-- [ ] 비공식 `autopark_forward/reverse` 채널이 현재 펌웨어에서 동작하는지 PC에서 PoC
-- [ ] 2.3 법적·약관 검토 완료
-- **판단 지점**: PoC 실패 시 Track B는 보류하고 Track A만 진행
+### Phase 0 — 조사 및 검증 (1~2주) — ✅ 2026-09-17 조사 완료 → [RESEARCH.md](RESEARCH.md)
+- [ ] Tesla 개발자 계정 등록, Fleet API 앱 생성, 도메인·공개키 호스팅 (Track A 진행 결정 후)
+- [ ] 보유 차량 모델·소프트웨어 버전 확인 (사용자 정보 필요)
+- [x] ~~비공식 `autopark_forward/reverse` 채널 PoC~~ → **수행하지 않음.** Owner API 차단 진행 중, 시도 시 Fleet API 계정 제재 사유
+- [x] 법적·약관 검토: 미지원 API 사용 시 접근 권한 회수, 안전 이벤트 무보장 확인
+- **판단 결과**: **Track B No-Go.** 공식·비공식 어느 경로에도 전진/후진 명령 없음. Track A는 차별화 방향 결정 후 조건부 진행
 
 ### Phase 1 — 프로젝트 골격 (1주)
 - [ ] Xcode 프로젝트 생성: `iam` (iOS) + `iam Watch App` (watchOS)
@@ -126,7 +126,7 @@
 - [ ] 통신 단절 시뮬레이션 테스트(비행기 모드, 앱 강제 종료)
 - [ ] 안전장치는 **차량 없이** Mock 백엔드로 100% 검증
 
-### Phase 4 — Track B: 전진/후진 실험 구현 (2~3주)
+### Phase 4 — Track B: 전진/후진 실험 구현 (2~3주) — ⏸ 보류 (Phase 0 결과, 공식 Summon 명령 공개 시 재개)
 - [ ] 스트리밍 WebSocket 연결 및 Summon 세션 핸드셰이크
 - [ ] `autopark_forward` / `autopark_reverse` / `autopark_abort` 송신
 - [ ] Hold-to-Move UI와 heartbeat 연결

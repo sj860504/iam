@@ -15,6 +15,12 @@ Apple Watch(watchOS) 앱 프로젝트입니다.
 ## 문서
 
 - [개발 계획서 (docs/PLAN.md)](docs/PLAN.md) — 목표, 실현 가능성 분석, 아키텍처, 안전 설계, 단계별 일정
+- [Phase 0 조사 보고서 (docs/RESEARCH.md)](docs/RESEARCH.md) — 테슬라 API 조사 결과와 Go/No-Go 판단 (2026-09-17)
+
+## 현재 상태
+
+Phase 0 조사 결과, 테슬라 공식·비공식 어느 경로에도 서드파티가 쓸 수 있는 전진/후진 명령이 없어
+**Summon 기능(Track B)은 보류**되었습니다. 공식 API 기반 기본 제어(Track A)는 차별화 방향을 정한 뒤 진행 여부를 결정합니다.
 
 ## 기술 스택
 
@@ -59,11 +65,11 @@ iam/
 
 ## 개발 로드맵
 
-- [ ] Phase 0: Fleet API 등록, 차량 Summon 지원 여부 및 비공식 채널 PoC 검증
+- [x] Phase 0: 테슬라 API 조사 및 Go/No-Go 판단 → [RESEARCH.md](docs/RESEARCH.md)
 - [ ] Phase 1: Xcode 프로젝트 골격, CI
 - [ ] Phase 2: 로그인, 차량 상태 조회, 잠금/해제·경적·트렁크 제어
 - [ ] Phase 3: Hold-to-Move, 데드맨 타이머 등 안전 인프라
-- [ ] Phase 4: 전진/후진(Summon) 실험 구현 및 실차 테스트
+- [ ] ~~Phase 4: 전진/후진(Summon) 실험 구현 및 실차 테스트~~ (보류)
 - [ ] Phase 5: 마무리, App Store 심사 검토(기본 제어 기능만)
 
 ## 요구 사항
