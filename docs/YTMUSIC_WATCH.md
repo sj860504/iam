@@ -66,3 +66,35 @@ YouTube API Services Developer Policies 명시:
 - watchOS WKWebView 미지원(Apple 개발자 포럼): https://developer.apple.com/forums/thread/109330
 - YouTube Music Apple Watch 오프라인 개발 중(9to5Google, 2026-06): https://9to5google.com/2026/06/23/youtube-music-may-soon-support-offline-downloads-on-apple-watch/
 - YTWatch 오픈소스 사례: https://github.com/andremiliano/YTWatch-OpenSource
+
+---
+
+## 5. "웹 인증(OAuth)으로 로그인해서 받으면 되지 않나?" — ❌ 안 됨
+
+직관은 합리적이지만, **"인증(내가 누구인지 증명)"과 "다운로드/스트림 권한"은 별개**입니다. 확인된 사실:
+
+### 5.1 공식 OAuth에는 오디오를 주는 스코프가 없음
+- YouTube Data API v3의 OAuth 스코프는 **채널·영상·재생목록·자막·업로드 등 메타데이터 관리용**뿐입니다.
+- **오디오 스트림이나 재생 가능한 파일을 반환하는 스코프가 아예 없습니다.** 즉 내 계정으로 완벽히 로그인해도 API가 돌려주는 건 "내 재생목록 목록" 같은 데이터일 뿐, 음원 1바이트도 주지 않습니다.
+- 구글은 서드파티용 **음악 스트리밍 스코프 자체를 만들지 않았습니다.** (Sonos 등 일부만 비공개 API 접근권을 가짐)
+
+### 5.2 Premium 다운로드는 DRM으로 암호화·기기잠금
+- YouTube Premium 오프라인 저장분은 단일 재생 파일이 아니라 **Widevine DRM으로 암호화된 조각(.exo 등)** 이며, **내 기기+계정에 잠겨** 있습니다.
+- 인증이 유효해도 추출 불가. yt-dlp 같은 도구도 DRM 벽에서 HTTP 403으로 막힙니다.
+
+### 5.3 서드파티가 실제로 쓰는 "웹 인증"의 정체
+- 그들이 말하는 웹 인증은 OAuth가 아니라 **브라우저 세션 쿠키를 빼내 YouTube Music 웹앱을 흉내내는 방식**입니다.
+- 게다가 구글은 재생 전에 **"Proof of Origin" 토큰**(진짜 YouTube 앱에서 온 요청인지 검사)을 요구해, 이를 우회해야 합니다.
+- 이건 명백한 **약관 위반(웹앱 사칭·비공식 접근)** 이고, App Store 거절·계정 정지·잦은 고장을 동반합니다.
+
+### 5.4 그리고 watchOS엔 그 인증 화면을 띄울 웹뷰도 없음
+- 설령 웹 로그인 흐름을 쓰려 해도 watchOS엔 WKWebView가 없어 **워치에서 OAuth 동의 화면이나 웹 플레이어를 띄울 수 없습니다.** (인증은 페어링된 iPhone에서 대신 처리해야 함)
+
+### 결론
+"웹 인증 → 다운로드"는 (a) **공식 OAuth**로 가면 오디오를 주는 스코프가 없어 받을 게 없고, (b) **쿠키/세션 사칭**으로 가면 약관 위반이며 워치에서 실행도 안 됩니다. 어느 쪽도 합법적인 워치 단독 앱이 되지 못합니다.
+
+### 참고 자료 (5절)
+- YouTube Data API OAuth 스코프: https://developers.google.com/youtube/v3/guides/auth/installed-apps
+- YouTube Music은 공식 API 없음·쿠키 인증만(Music Assistant): https://www.music-assistant.io/music-providers/youtube-music/
+- ytmusicapi OAuth 설명(스트리밍 스코프 부재): https://ytmusicapi.readthedocs.io/en/stable/setup/oauth.html
+- Premium 다운로드 Widevine DRM·기기잠금(yt-dlp DRM 이슈): https://github.com/yt-dlp/yt-dlp/issues/7820
