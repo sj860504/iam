@@ -98,3 +98,29 @@ YouTube API Services Developer Policies 명시:
 - YouTube Music은 공식 API 없음·쿠키 인증만(Music Assistant): https://www.music-assistant.io/music-providers/youtube-music/
 - ytmusicapi OAuth 설명(스트리밍 스코프 부재): https://ytmusicapi.readthedocs.io/en/stable/setup/oauth.html
 - Premium 다운로드 Widevine DRM·기기잠금(yt-dlp DRM 이슈): https://github.com/yt-dlp/yt-dlp/issues/7820
+
+---
+
+## 6. "앱 자체를 웹 기반(PWA/웹앱)으로 만들면 되지 않나?" — ❌ 안 됨
+
+두 층에서 막히며, 웹 방식은 **첫 층(플랫폼)에서부터** 실행 자체가 불가능합니다.
+
+### 6.1 플랫폼 층: Apple Watch에는 웹앱을 돌릴 곳이 없음
+- **브라우저가 없습니다.** watchOS에는 Safari도, PWA(홈 화면 웹앱) 설치 기능도 없습니다.
+- **개발자용 웹뷰(WKWebView)가 없습니다.** 네이티브 앱 안에 웹 화면을 끼워 넣는 것도 불가.
+- 유일하게 있는 숨겨진 웹 뷰어(Siri/메시지 링크로 열리는 것)는 **오디오/비디오 미디어 컴포넌트가 없고**, JavaScript가 무거운 페이지는 빈 화면이 됩니다. WristWeb·CommaSurf 같은 "워치 브라우저" 앱도 이 제한된 뷰어를 그대로 쓰는 것이라 미디어 재생이 안 됩니다.
+- 즉 "웹 기반 음악 플레이어"를 워치에 **설치할 방법도, 실행할 런타임도 없습니다.**
+
+### 6.2 라이선스 층: 클라이언트를 바꿔도 서버가 주는 것은 같음
+- 벽은 클라이언트가 네이티브냐 웹이냐가 아니라 **구글 서버가 무엇을 내주느냐**에 있습니다.
+- 웹으로 만들어도 여전히 공식 스트리밍 API 없음(2.1), 오디오 스코프 없음(5.1), DRM(5.2), 백그라운드/오디오 전용 재생 금지(2.2)가 그대로 적용됩니다.
+- 구글이 허용하는 유일한 웹 재생 수단인 **IFrame 플레이어**는 (a) 미디어 지원 브라우저가 필요해 워치에서 못 돌고, (b) 약관상 **화면 꺼진 백그라운드·오디오 전용 재생을 금지**해 음악 플레이어로 쓸 수 없습니다.
+
+### 결론
+웹 기반으로 만들면 오히려 **네이티브보다 더 일찍 막힙니다.** 워치에 웹 런타임이 없어 실행 자체가 안 되고, 설령 됐다 해도 구글이 서드파티에 음원을 내주지 않는 라이선스 벽은 동일합니다.
+
+### 참고 자료 (6절)
+- watchOS WKWebView 미지원(Apple 개발자 포럼): https://developer.apple.com/forums/thread/109330 , https://developer.apple.com/forums/thread/698287
+- 워치 숨겨진 웹 뷰어 제약(비디오 없음): https://www.idownloadblog.com/2018/06/18/apple-watch-web-content-howto/
+- YouTube IFrame 플레이어 API: https://developers.google.com/youtube/iframe_api_reference
+- YouTube 개발자 정책(백그라운드·오디오 분리 금지): https://developers.google.com/youtube/terms/developer-policies
