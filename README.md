@@ -4,8 +4,17 @@ Apple Watch(watchOS) 앱 프로젝트입니다.
 
 ## 소개
 
-`iam`은 Apple Watch에서 동작하는 독립형(standalone) watchOS 앱입니다.
-손목 위에서 빠르게 확인하고 조작할 수 있는 가볍고 직관적인 경험을 목표로 합니다.
+`iam`은 Apple Watch에서 **테슬라 차량을 제어**하는 watchOS 앱입니다.
+차량 상태 확인, 잠금/해제 같은 기본 제어와 함께, 버튼을 누르고 있는 동안만 차량이
+**전진 / 후진(Summon)** 하도록 하는 기능을 목표로 합니다.
+
+> ⚠️ 차량을 원격으로 움직이는 기능은 안전에 직접 영향을 줍니다. 테슬라 공식 API는
+> 전진/후진 명령을 제공하지 않으므로 해당 기능은 실험적이며 개인 사용 범위로 한정합니다.
+> 자세한 실현 가능성 분석과 안전 설계는 [개발 계획서](docs/PLAN.md)를 참고하세요.
+
+## 문서
+
+- [개발 계획서 (docs/PLAN.md)](docs/PLAN.md) — 목표, 실현 가능성 분석, 아키텍처, 안전 설계, 단계별 일정
 
 ## 기술 스택
 
@@ -14,20 +23,26 @@ Apple Watch(watchOS) 앱 프로젝트입니다.
 - **UI**: SwiftUI
 - **개발 도구**: Xcode 15 이상
 - **주요 프레임워크**
-  - WidgetKit (컴플리케이션)
-  - HealthKit (건강 데이터 연동, 필요 시)
-  - WatchConnectivity (iPhone 연동, 필요 시)
+  - WatchConnectivity (iPhone 컴패니언 앱 연동)
+  - WidgetKit (배터리 컴플리케이션)
+  - CoreBluetooth / CoreLocation (차량 근접 확인)
+  - CryptoKit (Tesla Fleet API 명령 서명)
+- **외부 연동**: Tesla Fleet API, `tesla/vehicle-command` HTTP 프록시
 
 ## 프로젝트 구조 (예정)
 
 ```
 iam/
+├── docs/
+│   └── PLAN.md             # 개발 계획서
+├── iam/                    # iOS 컴패니언 앱 (로그인, 토큰, 명령 중계)
 ├── iam Watch App/          # watchOS 앱 타깃
 │   ├── iamApp.swift        # 앱 진입점
-│   ├── Views/              # SwiftUI 화면
-│   ├── Models/             # 데이터 모델
+│   ├── Views/              # SwiftUI 화면 (홈, Summon 모드, 이동 중)
+│   ├── Models/             # 데이터 모델, 이동 상태 머신
 │   └── Assets.xcassets     # 이미지, 색상 등 리소스
 ├── iam Watch Widget/       # 컴플리케이션(WidgetKit) 타깃
+├── proxy/                  # tesla-http-proxy 구성 (Docker)
 └── iam.xcodeproj
 ```
 
@@ -44,11 +59,12 @@ iam/
 
 ## 개발 로드맵
 
-- [ ] Xcode 프로젝트 생성 및 기본 화면 구성
-- [ ] 핵심 기능 구현
-- [ ] 컴플리케이션 지원
-- [ ] iPhone 컴패니언 앱 연동 검토
-- [ ] App Store 출시 준비
+- [ ] Phase 0: Fleet API 등록, 차량 Summon 지원 여부 및 비공식 채널 PoC 검증
+- [ ] Phase 1: Xcode 프로젝트 골격, CI
+- [ ] Phase 2: 로그인, 차량 상태 조회, 잠금/해제·경적·트렁크 제어
+- [ ] Phase 3: Hold-to-Move, 데드맨 타이머 등 안전 인프라
+- [ ] Phase 4: 전진/후진(Summon) 실험 구현 및 실차 테스트
+- [ ] Phase 5: 마무리, App Store 심사 검토(기본 제어 기능만)
 
 ## 요구 사항
 
