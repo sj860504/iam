@@ -89,6 +89,46 @@ wss://{email}:{owner_api_token}@streaming.vn.teslamotors.com/connect/{vehicle_id
 - 오픈소스 [`acvigue/TesKey`](https://github.com/acvigue/TesKey): watchOS에서 CoreBluetooth + protobuf로 테슬라 Vehicle Command BLE 프로토콜 구현. 접근 시 자동 해제, 이탈 시 잠금, 원격 시동 동작.
 - 즉 iPhone 없이 워치 단독 BLE 제어는 가능하나, **BLE 경로에도 Summon 명령은 없음**(2.1과 동일한 프로토콜).
 
+### 2.7 테슬라 공식 앱의 Summon 버튼은 어떻게 동작하는가 → 서명된 명령을 Hermes 채널로 전송
+
+공식 앱은 서드파티가 쓸 수 없는 **두 겹의 전용 경로**를 사용합니다.
+
+**(구세대, ~2023) JSON 웹소켓 — 커뮤니티 문서화 완료**
+```
+wss://{email}:{owner_token}@streaming.vn.teslamotors.com/connect/{vehicle_id}
+← control:hello   { autopark: { heartbeat_frequency, autopark_pause_timeout, autopark_stop_timeout } }
+← autopark:status { autopark_state: "ready" }
+→ autopark:cmd_forward  { latitude, longitude }        ← 버튼 누름
+→ autopark:heartbeat_app { timestamp }  (누르는 동안 반복)
+← autopark:heartbeat_car { timestamp }
+→ autopark:cmd_abort                                  ← 버튼 뗌
+```
+
+**(현세대, 2023-11~) Hermes / Signaling 프로토콜 — 앱 트래픽 분석으로 일부 확인**
+1. 앱 전용 OAuth 토큰으로 `owner-api.teslamotors.com/api/1/users/jwt/hermes`, `/api/1/vehicles/{id}/jwt/hermes`에서 JWT 발급
+2. `wss://signaling.vn.teslamotors.com/v1/mobile`에 `X-Jwt` 헤더로 접속, **protobuf 바이너리** 교환
+3. 토픽 `vehicle_device.<VIN>.cmds`로 `HermesMessage` 전송. 페이로드는 BLE·Fleet API와 같은 **종단간 서명 명령(RoutableMessage)** 이며 폰 키의 개인키로 서명
+4. 접속 시 서버가 내려주는 autopark 설정: **heartbeat 100ms, pause timeout 2초, stop timeout 10초** → 버튼을 누르는 동안 100ms마다 heartbeat, 2초 끊기면 일시정지, 10초 끊기면 종료
+5. 차량은 별도로 **폰 키가 BLE 범위 안에 있는지** 확인 후에만 이동을 허용
+
+**서드파티가 재현할 수 없는 이유**
+- JWT 발급 엔드포인트가 테슬라 앱 전용 OAuth 클라이언트(`ownerapi`)에 묶여 있고, 서드파티 토큰은 2024년부터 차단
+- autopark 명령의 protobuf 메시지 정의가 공개 `vehicle-command` 저장소에 **없음** → 앱 디컴파일로 복원해야 함
+- 서명 키는 `tesla-control add-key-request`로 폰 키처럼 등록할 수 있지만, 위 두 조건 때문에 명령을 보낼 수 없음
+- 시도 자체가 약관 위반이며 Fleet API 접근 회수·계정 제재 사유
+
+### 2.8 보유 차량 확인 — Model Y 2025, SW 2026.20.6.1
+
+| 항목 | 결과 |
+|---|---|
+| 하드웨어 | HW4, Tesla Vision (USS 없음) |
+| Dumb Summon(전진/후진) | ✅ 공식 앱에서 사용 가능 (비전 기반, 2025.32.3 이후 복원) |
+| Actually Smart Summon | ✅ HW4 지원 (2024.27.20 이후) |
+| Fleet API / 서명 명령 | ✅ 지원 (2021년 이후 차량) |
+| BLE Vehicle Command | ✅ 지원 → 워치 단독 BLE 제어(잠금/트렁크/공조 등) 가능 |
+| 공식 Apple Watch 앱 | ✅ SW 2024.44.25+ 충족 |
+| 결론 | 차량은 모든 기능을 갖췄으나, 전진/후진은 **공식 앱에만 열린 Hermes 채널**로만 제어됨 → Track B No-Go 판단 유지 |
+
 ---
 
 ## 3. Go / No-Go 판단
@@ -123,7 +163,7 @@ wss://{email}:{owner_api_token}@streaming.vn.teslamotors.com/connect/{vehicle_id
 
 1. Track A 진행 여부와 차별화 방향 결정 (자동화 / 컴플리케이션 / BLE 오프라인 제어 등)
 2. 진행 시: Tesla 개발자 계정 생성, 공개키 호스팅용 도메인 확보
-3. 보유 차량 모델·연식·소프트웨어 버전 공유 → Fleet API 및 BLE 지원 여부 최종 확인
+3. ~~보유 차량 확인~~ → Model Y 2025 / 2026.20.6.1 확인 완료 (2.8절). Fleet API·BLE 모두 지원
 
 ---
 
@@ -139,6 +179,9 @@ wss://{email}:{owner_api_token}@streaming.vn.teslamotors.com/connect/{vehicle_id
 - Fleet API 리전별 URL: https://developer.tesla.com/docs/fleet-api/getting-started/base-urls
 - 비공식 Summon 웹소켓 구현(teslams PR #118): https://github.com/hjespers/teslams/pull/118/files
 - 비공식 API 문서(timdorr): https://github.com/timdorr/tesla-api/tree/master/docs/vehicle
+- Hermes/Signaling 프로토콜 분석(이슈 #768): https://github.com/timdorr/tesla-api/issues/768
+- Hermes/Signaling 프로토콜 토론(#769): https://github.com/timdorr/tesla-api/discussions/769
+- 서명 명령 프로토콜 문서: https://github.com/teslamotors/vehicle-command/blob/main/pkg/protocol/protocol.md
 - Owner API 폐지 논의(TeslaMate #3792): https://github.com/teslamate-org/teslamate/discussions/3792
 - Fleet API 과금 의견(TeslaMate #4408): https://github.com/teslamate-org/teslamate/discussions/4408
 - Fleet API 종량제 설명(Teslemetry): https://teslemetry.com/blog/tesla-fleet-api-pay-per-use
