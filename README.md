@@ -16,6 +16,7 @@ Apple Watch(watchOS) 앱 프로젝트입니다.
 - [오프라인 미디어 플레이어 계획서 (docs/MEDIA_PLAYER_PLAN.md)](docs/MEDIA_PLAYER_PLAN.md) — **현재 진행 방향**
 - [테슬라 제어 앱 계획서 (docs/PLAN.md)](docs/PLAN.md) — 초기 탐색(보류)
 - [테슬라 Phase 0 조사 보고서 (docs/RESEARCH.md)](docs/RESEARCH.md) — 실현 가능성 조사 (2026-09-17)
+- [유튜브 뮤직 워치 단독 실행 조사 (docs/YTMUSIC_WATCH.md)](docs/YTMUSIC_WATCH.md) — 서드파티로는 불가한 이유 (2026-09-17)
 
 ## 현재 상태
 
