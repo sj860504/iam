@@ -155,6 +155,35 @@ wss://{email}:{owner_token}@streaming.vn.teslamotors.com/connect/{vehicle_id}
 **참고 — 검색 중 상충 정보**
 일부 블로그(Torque News, TeslaTap 요약)는 "Summon은 FSD 없이 쓰는 기본 기능"이라고 서술하나, 이는 부정확하거나 오래된 정보입니다. 테슬라 공식 지원 문서와 다수 오너 포럼(TMC)은 **Summon = EAP/FSD 전용**으로 일관되게 확인합니다. 2021년 5월 이후 레이더·USS 제거 차량은 auto-summon도 별도로 제한됐습니다.
 
+### 2.10 정비 모드 / 개발자 모드 / CAN 등 다른 우회 경로 → ❌ 모두 부적합
+
+전진/후진을 EAP 없이, 그리고 워치에서 제어하려는 관점에서 각 경로를 평가합니다.
+
+**(a) 정비 모드(Service Mode)**
+- 터치스크린에서 `Controls > Software`의 모델명을 길게 눌러 코드 `service`로 진입하는 진단 UI. 전/후륜 모터, 브레이크, 서스펜션 등 서브시스템 테스트용.
+- 공식 문서가 **"정비 모드에서 주행 금지"**(트랙션 컨트롤 등 안전 기능 비활성화)를 명시. **원격 이동 명령을 노출하지 않음.**
+- Summon 라이선스를 부여하지도 않음. 워치/폰에서 호출할 API가 아니라 차량 화면 전용.
+- 결론: 전진/후진 제어에 사용 불가.
+
+**(b) Service Mode+ / Toolbox 3 (테슬라 정비 도구)**
+- 테슬라 서비스센터·인증 정비소용. **연 약 $3,000**(또는 30일 $500) 구독 + 전용 케이블 + **차주 이메일 승인** 필요.
+- 기능은 액추에이터 자가진단·캘리브레이션·로그 등 **진단**이며, 폰/워치에서 차를 앞뒤로 모는 원격 주행 인터페이스가 아님.
+- 결론: 비용·인증·용도 모두 부적합.
+
+**(c) 개발자/팩토리 모드(GUI_developerMode / GUI_tdsMode / Factory 탭)**
+- 설정 플래그를 켜면 "Factory" 탭에 `SummonConveyor` 등이 노출됨. 이는 **공장 조립 라인에서 QR 코드를 읽어 차를 컨베이어처럼 이동**시키는 생산용 기능.
+- 최신 펌웨어는 이 모드 진입을 잠금(코드·VPN·서명 접근 필요), 재부팅 후 유지 안 됨. **외부 API로 노출되지 않아** 워치가 호출할 수 없음.
+- 일반 Summon의 EAP 라이선스 잠금을 우회하지도 않음.
+- 결론: 접근성·안정성·API 부재로 사용 불가.
+
+**(d) CAN 버스 직접 주입**
+- 테슬라는 주행·안전 계통을 **보안 게이트웨이로 분리된 3개 CAN 네트워크**로 구성. 2016년 Keen Lab의 CAN 주입 시연 직후 **코드 서명 보호**를 추가.
+- CAN **읽기**(CANserver 등 대시/텔레메트리)는 가능하나, 주행 명령 **쓰기**는 게이트웨이·서명으로 차단됨.
+- 차량 내부에 물리 하드웨어를 상시 연결해야 하고, 보증 무효·약관 위반·안전 및 법적 책임. 워치/원격 API 경로가 전혀 아님.
+- 결론: 실현성·합법성·안전성 모두 부적합.
+
+**종합**: 정비 모드·개발자 모드·Toolbox·CAN 어느 것도 (1) EAP 라이선스 잠금을 정당하게 풀지 못하고, (2) 워치/폰이 호출할 원격 이동 API를 제공하지 않으며, (3) 상당수는 물리 접근·고가 구독·차량 해킹을 요구합니다. **2.9절의 이중 차단 결론은 그대로 유지됩니다.**
+
 ---
 
 ## 3. Go / No-Go 판단
@@ -228,3 +257,10 @@ wss://{email}:{owner_token}@streaming.vn.teslamotors.com/connect/{vehicle_id}
 - Summon EAP 필요 여부 논의(TMC): https://teslamotorsclub.com/tmc/threads/can-i-access-the-summon-command-without-full-self-driving-capability.263192/
 - FSD 없이 전진/후진 요청(TeslaTap): https://teslatap.com/desired-features/ability-to-move-forward-back-with-app-without-fsd/
 - Tesla 오토파일럿 지원 문서: https://www.tesla.com/support/autopilot
+- 정비 모드 설명(Not a Tesla App): https://www.notateslaapp.com/news/2046/tesla-service-mode-how-to-access-it-and-what-it-does
+- 정비 모드 공식 문서(Tesla Service): https://service.tesla.com/docs/Public/ServiceMode/service_mode_user_guide.pdf
+- Toolbox 3 연결 문서(Tesla Service): https://service.tesla.com/docs/ModelS/ServiceManual/en-us/GUID-291C383D-E64F-4A2F-B673-2532F0B3181A.html
+- 소프트웨어 모드 분석(Tristan Rice): https://fn.lc/post/tesla-model-3-modes/
+- Tesla CAN 게이트웨이 취약점(CISA CVE-2016-9337): https://cisa.gov/uscert/ics/advisories/ICSA-16-341-01
+- Keen Lab CAN 주입·코드 서명(Black Hat 2017): https://blackhat.com/docs/us-17/thursday/us-17-Nie-Free-Fall-Hacking-Tesla-From-Wireless-To-CAN-Bus-wp.pdf
+- Tesla CAN 리버스 엔지니어링(danman): https://blog.danman.eu/reverse-engineering-tesla-2-bus-protocol/
