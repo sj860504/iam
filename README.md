@@ -4,23 +4,27 @@ Apple Watch(watchOS) 앱 프로젝트입니다.
 
 ## 소개
 
-`iam`은 Apple Watch에서 **테슬라 차량을 제어**하는 watchOS 앱입니다.
-차량 상태 확인, 잠금/해제 같은 기본 제어와 함께, 버튼을 누르고 있는 동안만 차량이
-**전진 / 후진(Summon)** 하도록 하는 기능을 목표로 합니다.
+`iam`은 Apple Watch용 앱을 탐색하는 저장소입니다. 현재 진행 방향은
+**워치 오프라인 미디어 플레이어**로, 사용자가 권리를 가진 음악/영상 파일을 iPhone에서
+워치로 옮겨 iPhone 없이 오프라인 재생하는 앱입니다. (초기에는 테슬라 차량 제어를 탐색했으나 보류)
 
-> ⚠️ 차량을 원격으로 움직이는 기능은 안전에 직접 영향을 줍니다. 테슬라 공식 API는
-> 전진/후진 명령을 제공하지 않으므로 해당 기능은 실험적이며 개인 사용 범위로 한정합니다.
-> 자세한 실현 가능성 분석과 안전 설계는 [개발 계획서](docs/PLAN.md)를 참고하세요.
+> ⚠️ YouTube에서 영상/음악을 직접 다운로드하는 기능은 YouTube 약관 위반이자 App Store
+> 심사 거절 대상이라 구현하지 않습니다. 이 앱은 사용자가 합법적으로 확보한 파일을 import 합니다.
 
 ## 문서
 
-- [개발 계획서 (docs/PLAN.md)](docs/PLAN.md) — 목표, 실현 가능성 분석, 아키텍처, 안전 설계, 단계별 일정
-- [Phase 0 조사 보고서 (docs/RESEARCH.md)](docs/RESEARCH.md) — 테슬라 API 조사 결과와 Go/No-Go 판단 (2026-09-17)
+- [오프라인 미디어 플레이어 계획서 (docs/MEDIA_PLAYER_PLAN.md)](docs/MEDIA_PLAYER_PLAN.md) — **현재 진행 방향**
+- [테슬라 제어 앱 계획서 (docs/PLAN.md)](docs/PLAN.md) — 초기 탐색(보류)
+- [테슬라 Phase 0 조사 보고서 (docs/RESEARCH.md)](docs/RESEARCH.md) — 실현 가능성 조사 (2026-09-17)
 
 ## 현재 상태
 
-Phase 0 조사 결과, 테슬라 공식·비공식 어느 경로에도 서드파티가 쓸 수 있는 전진/후진 명령이 없어
-**Summon 기능(Track B)은 보류**되었습니다. 공식 API 기반 기본 제어(Track A)는 차별화 방향을 정한 뒤 진행 여부를 결정합니다.
+두 가지 방향을 탐색했습니다.
+
+1. **테슬라 전진/후진 제어(보류)** — 조사 결과 서드파티가 쓸 수 있는 Summon 명령이 공식·비공식 어디에도 없고,
+   전진/후진은 EAP/FSD 라이선스가 차량 펌웨어에 잠겨 있어 API로 우회 불가. 자세한 내용은 [RESEARCH.md](docs/RESEARCH.md).
+2. **Apple Watch 오프라인 미디어 플레이어(진행)** — 사용자가 권리를 가진 음악/영상 파일을 iPhone에서 워치로 옮겨
+   오프라인 재생하는 앱. YouTube 직접 다운로드는 약관 위반이라 미구현. 계획은 [MEDIA_PLAYER_PLAN.md](docs/MEDIA_PLAYER_PLAN.md).
 
 ## 기술 스택
 
